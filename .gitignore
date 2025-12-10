@@ -1,0 +1,29 @@
+# ========== UNITY ==========
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# ========== VISUAL STUDIO / RIDER ==========
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+
+# ========== OS FILE ==========
+.DS_Store
+Thumbs.db
+
+# ========== UNITY CACHE ==========
+*.pidb.meta
+*.pdb.meta
+*.mdb.meta
+sysinfo.txt
