@@ -16,13 +16,19 @@ EditorBuildSettings:
     guid: 89fff82e127634c4ea5b785008bab46b
   - enabled: 1
     path: Assets/Projects/Scenes/Level2_BawahTanah.unity
-    guid: 8a29451a7da8fd3498ca1d0b2d0aaf22
+    guid: c0627be1522ca1f4bac2e720a75a2083
   - enabled: 1
     path: Assets/Projects/Scenes/Tunnel_Fall_2.unity
     guid: 9c2786f67a7593f49a94fb94e61878e4
   - enabled: 1
+    path: Assets/Projects/Scenes/Level3_BawahTanah.unity
+    guid: 8a29451a7da8fd3498ca1d0b2d0aaf22
+  - enabled: 1
     path: Assets/Projects/Scenes/Level3_Gua.unity
     guid: 76fc81f71972a9245aa5bb102e6bdcfe
+  - enabled: 1
+    path: Assets/Projects/Scenes/Tunnel_Fall_3.unity
+    guid: 48bb250282e21cf42ab45f6a2dbc59da
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
