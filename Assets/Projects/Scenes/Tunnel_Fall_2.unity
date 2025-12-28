@@ -805,7 +805,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FadeController
   fadeImage: {fileID: 596932799}
   fadeDuration: 0.1
-  nextSceneName: Level3_BawahTanah
+  nextSceneName: LevelOption
 --- !u!114 &1748888238
 MonoBehaviour:
   m_ObjectHideFlags: 0
