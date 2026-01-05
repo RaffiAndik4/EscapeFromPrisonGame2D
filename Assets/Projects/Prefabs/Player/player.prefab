@@ -44,6 +44,8 @@ GameObject:
   - component: {fileID: 6069776593375550636}
   - component: {fileID: 3751128180755386017}
   - component: {fileID: 8432306472286250047}
+  - component: {fileID: -3028114419280279625}
+  - component: {fileID: -228655367574405959}
   m_Layer: 0
   m_Name: player
   m_TagString: Player
@@ -202,9 +204,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
   moveSpeed: 7
-  jumpForce: 10
+  jumpForce: 15
   groundCheck: {fileID: 4321527058575869482}
   checkRadius: 0.2
   groundLayer:
     serializedVersion: 2
     m_Bits: 64
+  ladderLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  ladderSpeed: 4
+--- !u!114 &-3028114419280279625
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6396541862673075544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 71333c8a351ceff4cb46a7ee673fb7ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
+  maxHealth: 3
+--- !u!114 &-228655367574405959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6396541862673075544}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87cf26f3fc7905c4bba61aab38c100b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'

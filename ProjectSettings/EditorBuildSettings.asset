@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Projects/Scenes/SampleScene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
   - enabled: 1
+    path: Assets/Projects/Scenes/MainMenu.unity
+    guid: 73a6e3525ec387a45baf11b8e706d6c9
+  - enabled: 1
     path: Assets/Projects/Scenes/Level1_Penjara.unity
     guid: ac4fb9db22118de4e884658443fe31b9
   - enabled: 1
@@ -26,15 +29,21 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Projects/Scenes/LevelOption1.unity
     guid: 8a29451a7da8fd3498ca1d0b2d0aaf22
-  - enabled: 0
-    path: Assets/Projects/Scenes/Level3_Gua.unity
-    guid: 76fc81f71972a9245aa5bb102e6bdcfe
+  - enabled: 1
+    path: Assets/Projects/Scenes/LevelOption2.unity
+    guid: d68be4f9d47c1e440a64b88859df86d9
+  - enabled: 1
+    path: Assets/Projects/Scenes/TunnelOption2.unity
+    guid: deb1c8b0ee31c8d4cb7083a417dfd361
   - enabled: 1
     path: Assets/Projects/Scenes/TunnelOption1.unity
     guid: 48bb250282e21cf42ab45f6a2dbc59da
   - enabled: 1
     path: Assets/Projects/Scenes/LevelTangga.unity
     guid: 2fae9f92e9f7b5b48b43e55f4bcc7445
+  - enabled: 1
+    path: Assets/Projects/Scenes/Level_pantai.unity
+    guid: ee4af4dd9b69065498a138e458a0fa39
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -1,5 +1,6 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement Settings")]
@@ -11,56 +12,115 @@ public class PlayerMovement : MonoBehaviour
     public float checkRadius = 0.2f;
     public LayerMask groundLayer;
 
-    [Header("Ladder Settings")]
-    public LayerMask ladderLayer;     // set ke Layer "Ladder"
-    public float ladderSpeed = 4f;
+    [Header("Ladder")]
+    public LayerMask ladderLayer;      // set ke Layer Ladder
+    public float climbSpeed = 4f;      // kecepatan naik/turun tangga
+
+    [Header("Animator (optional)")]
+    public Animator animator;          // drag animator player (optional)
+    public string speedParam = "speed";
+    public string groundedParam = "isGrounded";
+    public string climbingParam = "isClimbing";
+
+    [Header("SFX")]
+    public AudioClip jumpSfx;
+    public AudioClip footstepSfx;
+    [Tooltip("Jarak waktu antar langkah (detik). Semakin kecil semakin sering bunyi step.")]
+    public float stepInterval = 0.35f;
+    [Tooltip("Volume footstep (0-1).")]
+    [Range(0f, 1f)] public float footstepVolume = 0.6f;
+    [Tooltip("Volume jump (0-1).")]
+    [Range(0f, 1f)] public float jumpVolume = 0.8f;
 
     private Rigidbody2D rb;
     private bool isGrounded;
-
-    private float moveInputX;
-    private float moveInputY;
-
-    // Ladder state
-    private bool isOnLadder;
     private bool isClimbing;
+    private float moveX;
+    private float moveY;
     private float defaultGravity;
 
-    void Start()
+    // footstep timer
+    private float stepTimer;
+
+    // flip yang aman (tidak konflik dengan animasi scale)
+    private SpriteRenderer spriteRenderer;
+
+    void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         defaultGravity = rb.gravityScale;
+
+        if (animator == null) animator = GetComponentInChildren<Animator>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
     }
 
     void Update()
     {
         ReadInput();
         CheckGround();
-        CheckLadder();
-
-        HandleHorizontalMove();
+        CheckLadder();     // cek apakah sedang menyentuh tangga
         HandleJump();
-        HandleLadderClimb();
-        FlipSprite();
+        HandleFootstepSfx(); // tambahan SFX (tidak mengubah logic lama)
+        UpdateAnimator();
+    }
+
+    void FixedUpdate()
+    {
+        HandleMove();
+        HandleClimb();
     }
 
     void ReadInput()
     {
-        moveInputX = Input.GetAxisRaw("Horizontal"); // A/D, Left/Right
-        moveInputY = Input.GetAxisRaw("Vertical");   // W/S, Up/Down
+        moveX = Input.GetAxisRaw("Horizontal"); // A/D atau Left/Right
+        moveY = Input.GetAxisRaw("Vertical");   // W/S atau Up/Down
     }
 
-    void HandleHorizontalMove()
+    void CheckGround()
     {
-        // Saat climbing, kita tetap boleh jalan kiri/kanan (opsional).
-        // Kalau mau dikunci saat naik tangga, tinggal set moveX = 0 saat isClimbing.
-        float vx = moveInputX * moveSpeed;
-        rb.linearVelocity = new Vector2(vx, rb.linearVelocity.y);
+        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
+    }
+
+    void CheckLadder()
+    {
+        Collider2D ladderHit = Physics2D.OverlapCircle(transform.position, 0.2f, ladderLayer);
+
+        bool touchingLadder = ladderHit != null;
+
+        if (touchingLadder && Mathf.Abs(moveY) > 0.01f)
+        {
+            isClimbing = true;
+        }
+        else if (!touchingLadder)
+        {
+            isClimbing = false;
+        }
+
+        rb.gravityScale = isClimbing ? 0f : defaultGravity;
+    }
+
+    void HandleMove()
+    {
+        // sama fungsinya: gerak X
+        rb.linearVelocity = new Vector2(moveX * moveSpeed, rb.linearVelocity.y);
+
+        // flip sprite kiri/kanan (lebih aman dari scale)
+        if (spriteRenderer != null && Mathf.Abs(moveX) > 0.001f)
+        {
+            spriteRenderer.flipX = moveX < 0f;
+        }
+    }
+
+    void HandleClimb()
+    {
+        if (!isClimbing) return;
+
+        // sama fungsinya: kontrol Y saat di tangga
+        rb.linearVelocity = new Vector2(rb.linearVelocity.x, moveY * climbSpeed);
     }
 
     void HandleJump()
     {
-        // Jangan bisa lompat saat sedang climbing tangga
         if (isClimbing) return;
 
         if ((Input.GetKeyDown(KeyCode.Space) ||
@@ -68,71 +128,50 @@ public class PlayerMovement : MonoBehaviour
              Input.GetKeyDown(KeyCode.W)) && isGrounded)
         {
             rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
+
+            // SFX Jump
+            if (jumpSfx != null && SFXManager.Instance != null)
+                SFXManager.Instance.Play(jumpSfx, jumpVolume);
         }
     }
 
-    void CheckGround()
+    void HandleFootstepSfx()
     {
-        if (groundCheck == null) return;
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, checkRadius, groundLayer);
-    }
-
-    void CheckLadder()
-    {
-        // Cara paling aman: cek overlap circle kecil di posisi player (bisa juga pakai collider trigger event)
-        // Kalau kamu sudah pakai collider trigger, ini tetap aman sebagai backup.
-        isOnLadder = Physics2D.OverlapCircle(transform.position, 0.15f, ladderLayer);
-    }
-
-    void HandleLadderClimb()
-    {
-        // Kalau tidak berada di tangga -> pastikan kondisi normal
-        if (!isOnLadder)
+        // Step hanya saat di ground, bergerak horizontal, dan tidak sedang climb
+        if (!isGrounded || isClimbing || Mathf.Abs(moveX) <= 0.1f || footstepSfx == null)
         {
-            if (isClimbing)
-            {
-                isClimbing = false;
-                rb.gravityScale = defaultGravity;
-            }
+            stepTimer = 0f;
             return;
         }
 
-        // Di area tangga:
-        // Jika player menekan atas/bawah, mulai climbing
-        if (Mathf.Abs(moveInputY) > 0.01f)
+        stepTimer -= Time.deltaTime;
+        if (stepTimer <= 0f)
         {
-            isClimbing = true;
-        }
+            if (SFXManager.Instance != null)
+                SFXManager.Instance.Play(footstepSfx, footstepVolume);
 
-        if (isClimbing)
-        {
-            rb.gravityScale = 0f;
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, moveInputY * ladderSpeed);
-        }
-        else
-        {
-            // masih di area ladder tapi tidak climbing -> tetap normal (gravity normal)
-            rb.gravityScale = defaultGravity;
+            stepTimer = stepInterval;
         }
     }
 
-    void FlipSprite()
+    void UpdateAnimator()
     {
-        if (moveInputX != 0)
-            transform.localScale = new Vector3(Mathf.Sign(moveInputX), 1f, 1f);
+        if (animator == null) return;
+
+        animator.SetFloat(speedParam, Mathf.Abs(moveX));
+        animator.SetBool(groundedParam, isGrounded);
+        animator.SetBool(climbingParam, isClimbing);
     }
 
-    // OPTIONAL CROUCH (↓ or S)
-    public bool IsCrouching()
-    {
-        return Input.GetKey(KeyCode.DownArrow) || Input.GetKey(KeyCode.S);
-    }
-
-    // Debug ground check circle (optional)
     void OnDrawGizmosSelected()
     {
-        if (groundCheck == null) return;
+        if (groundCheck != null)
+        {
+            Gizmos.color = Color.green;
+            Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
+        }
+
         Gizmos.color = Color.yellow;
-        Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
+        Gizmos.DrawWireSphere(transform.position, 0.2f);
     }
 }
